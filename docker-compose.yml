@@ -20,7 +20,7 @@ services:
     networks:
       - dakota_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dakota_user}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dakota_user} -d ${POSTGRES_DB:-energy_analytics}"]
       interval: 10s
       timeout: 5s
       retries: 5
