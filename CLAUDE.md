@@ -98,7 +98,7 @@ docker exec -i dakota_postgres psql -U dakota_user -d energy_analytics < databas
 - **Time-series considerations**: Partitioning, indexing on timestamp columns for query performance
 
 ### dbt Model Organization
-Models should be organized in a layered architecture (medallion, Kimball, or custom):
+Models should be organized in a layered architecture (medallion):
 - Document the chosen pattern and rationale in `docs/decisions.md`
 - Use incremental models for large time-series data
 - Include data quality tests (not_null, unique, relationships, accepted_values)
