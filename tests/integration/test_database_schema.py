@@ -7,7 +7,6 @@ Tests verify that:
 4. Seed data is populated
 """
 
-import pytest
 from sqlalchemy import inspect, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
@@ -103,20 +102,24 @@ class TestStagingTables:
         assert "stg_energy_consumption" in tables
 
     def test_stg_enrichment_exists(self, db_engine: Engine) -> None:
-        """Test that stg_enrichment table exists."""
+        """Test that stg_enrichment table or view exists."""
         inspector = inspect(db_engine)
         tables = inspector.get_table_names(schema="staging")
-        assert "stg_enrichment" in tables
+        views = inspector.get_view_names(schema="staging")
+        all_relations = tables + views
+        assert "stg_enrichment" in all_relations
 
 
 class TestIntermediateTables:
     """Test that intermediate schema tables exist."""
 
     def test_int_energy_combined_exists(self, db_engine: Engine) -> None:
-        """Test that int_energy_combined table exists."""
+        """Test that int_energy_combined table or view exists."""
         inspector = inspect(db_engine)
         tables = inspector.get_table_names(schema="intermediate")
-        assert "int_energy_combined" in tables
+        views = inspector.get_view_names(schema="intermediate")
+        all_relations = tables + views
+        assert "int_energy_combined" in all_relations
 
 
 class TestMartsTables:
