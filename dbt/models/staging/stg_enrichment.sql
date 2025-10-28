@@ -42,8 +42,8 @@ enrichment_cleaned as (
 
         period as period_raw,
 
-        -- Location dimension (standardize to match EIA format)
-        trim(upper(location)) as location,
+        -- Location dimension (standardize to match EIA format - remove US- prefix)
+        trim(upper(regexp_replace(location, '^US-', ''))) as location,
 
         -- Weather data
         temperature_avg as temperature_fahrenheit,

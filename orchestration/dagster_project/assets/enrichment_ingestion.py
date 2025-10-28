@@ -106,9 +106,9 @@ async def enrichment_ingestion(context: AssetExecutionContext) -> Output[dict[st
     end_date = (now - timedelta(days=60)).date()  # 2 months ago
     start_date = end_date - timedelta(days=90)  # 3 months of data
 
-    # Locations WITHOUT "US-" prefix to match EIA format
-    # (staging model will standardize these)
-    locations = ["CA", "TX", "NY", "FL"]
+    # Locations WITH "US-" prefix to match dim_location table
+    # The dimension tables use standardized "US-XX" format
+    locations = ["US-CA", "US-TX", "US-NY", "US-FL"]
 
     context.log.info(
         f"Starting enrichment ingestion for {len(locations)} locations from {start_date} to {end_date}"

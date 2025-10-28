@@ -110,7 +110,7 @@ class TestEnrichmentIngestionAsset:
         # Mock the enrichment client
         mock_client = AsyncMock()
         mock_data = {
-            "location": "CA",
+            "location": "US-CA",
             "date": "2024-01-01",
             "temperature_fahrenheit": 65.5,
             "population": 39000000,
@@ -125,7 +125,7 @@ class TestEnrichmentIngestionAsset:
         result = await enrichment_ingestion_impl(
             client=mock_client,
             writer=mock_writer,
-            locations=["CA", "TX", "NY", "FL"],
+            locations=["US-CA", "US-TX", "US-NY", "US-FL"],
             start_date=date(2024, 1, 15),
             end_date=date(2024, 3, 15),
         )
@@ -152,7 +152,7 @@ class TestEnrichmentIngestionAsset:
         result = await enrichment_ingestion_impl(
             client=mock_client,
             writer=mock_writer,
-            locations=["CA"],
+            locations=["US-CA"],
             start_date=date(2024, 1, 1),
             end_date=date(2024, 1, 31),
         )

@@ -294,7 +294,8 @@ class EnrichmentDataWriter(DatabaseWriter):
                 temperature_unit = "fahrenheit" if temperature_avg is not None else None
 
                 population = enrichment_record.get("population")
-                gdp_per_capita = enrichment_record.get("gdp_per_capita")
+                # API returns "gdp_per_capita_usd", not "gdp_per_capita"
+                gdp_per_capita = enrichment_record.get("gdp_per_capita_usd") or enrichment_record.get("gdp_per_capita")
                 industrial_activity_index = enrichment_record.get("industrial_activity_index")
 
                 # Store full response as JSON
