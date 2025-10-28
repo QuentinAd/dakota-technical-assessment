@@ -1,12 +1,22 @@
 """Shared pytest fixtures for all tests."""
 
 import os
-from typing import Generator
+import sys
+from collections.abc import Generator
+from pathlib import Path
 
 import pytest
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Add orchestration directory to Python path for dagster_project imports
+orchestration_dir = Path(__file__).parent.parent / "orchestration"
+sys.path.insert(0, str(orchestration_dir))
 
 
 @pytest.fixture(scope="session")
