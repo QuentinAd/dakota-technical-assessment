@@ -7,10 +7,10 @@ This guide shows how to initialize `uv` in the existing Dakota Analytics project
 Install `uv` if you haven't already:
 
 ```bash
-# macOS/Linux
+# macOS/Linux/Windows Git Bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Windows
+# Windows Powershell
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 # Or with pip
@@ -19,16 +19,9 @@ pip install uv
 
 ## Initializing the Project
 
-Since you have an existing project skeleton, follow these steps:
+The pyproject.toml was manually created to prevent creation of the default uv project structure.
 
-### 1. Copy pyproject.toml to your project root
-
-```bash
-cp pyproject.toml /path/to/dakota-analytics/
-cd /path/to/dakota-analytics/
-```
-
-### 2. Initialize uv without creating a new project structure
+### Initialize uv without creating a new project structure
 
 ```bash
 # This will use the existing pyproject.toml and create a virtual environment
@@ -39,17 +32,14 @@ This creates:
 - `.venv/` - Virtual environment
 - `uv.lock` - Lockfile with exact dependency versions
 
-### 3. Install with dev dependencies
+### Install with dev dependencies
 
 ```bash
 # Sync with dev dependencies
 uv sync --extra dev
-
-# Or sync everything (all optional dependency groups)
-uv sync --all-extras
 ```
 
-## Daily Usage
+## Recommended Usage
 
 ### Activating the virtual environment
 
@@ -57,7 +47,10 @@ uv sync --all-extras
 # macOS/Linux
 source .venv/bin/activate
 
-# Windows
+# Windows on Git Bash
+source .venv\\Scripts\\activate
+
+# Windows Powershell
 .venv\Scripts\activate
 ```
 
@@ -117,19 +110,7 @@ dakota-analytics/
 ├── .venv/                  # Virtual environment (gitignored)
 ├── pyproject.toml         # Project configuration
 ├── uv.lock               # Locked dependencies (commit this)
-├── .env.example
-├── .gitignore
-├── README.md
-├── docker-compose.yml
-├── run.sh
-├── api/
-├── ingestion/
-├── orchestration/
-├── database/
-├── dbt/
-├── reports/
-├── docs/
-└── tests/
+├──...
 ```
 
 ## Tips
@@ -154,7 +135,7 @@ uv python install 3.11
 uv sync --python 3.11
 ```
 
-### 4. Scripts
+### Scripts
 
 Add custom scripts to pyproject.toml:
 
@@ -170,7 +151,7 @@ Then run with:
 uv run ingest --source eia
 ```
 
-### 5. Pre-commit hooks
+### Pre-commit hooks
 
 Set up pre-commit with ruff:
 
@@ -255,12 +236,7 @@ uv sync --no-cache
 
 ### Import errors
 
-Make sure you're using `uv run` or have activated the virtual environment:
-
-```bash
-source .venv/bin/activate  # Activate first
-python script.py
-```
+Make sure you're using `uv run` or have activated the virtual environment (see above).
 
 Or:
 

@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **NEVER write implementation code before writing tests**
 - **ALWAYS write failing tests first, then implement**
 - Minimum 80% code coverage required
+- Always run `uv run ruff check --fix` and `ruff lint` and `uv run ruff format` in the refactor phase ensure highest code quality standards
 
 **IMPORTANT: This project uses `uv` for dependency management**
 - **ALWAYS use `uv add` to add dependencies** (auto-updates pyproject.toml)

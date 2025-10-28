@@ -1,8 +1,3 @@
-version: '3.8'
-
-# This is a starter template. Modify and extend based on your implementation.
-# The code below is just for example, we expect you to modify it.
-
 services:
   # PostgreSQL Database or other database
   postgres:
@@ -25,12 +20,55 @@ services:
       timeout: 5s
       retries: 5
 
-  # Add your services here:
-  # - FastAPI service
-  # - Orchestrator
-  # - dbt
-  # - Jupyter (optional for notebooks)
-  # etc.
+  # FastAPI Enrichment Service
+  enrichment-api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    container_name: dakota_enrichment_api
+    ports:
+      - "8000:8000"
+    networks:
+      - dakota_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+  # Dagster Orchestration Service
+  dagster:
+    build:
+      context: .
+      dockerfile: orchestration/Dockerfile
+    container_name: dakota_dagster
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-energy_analytics}
+      POSTGRES_USER: ${POSTGRES_USER:-dakota_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-dakota_user}:${POSTGRES_PASSWORD:-change_me}@postgres:5432/${POSTGRES_DB:-energy_analytics}
+      DBT_POSTGRES_HOST: postgres
+      EIA_API_KEY: ${EIA_API_KEY}
+      ENRICHMENT_API_URL: http://enrichment-api:8000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./orchestration/dagster_project:/opt/dagster/app/dagster_project
+      - ./ingestion:/opt/dagster/app/ingestion
+      - ./dbt:/opt/dagster/app/dbt
+      - ./reports:/opt/dagster/app/reports
+      - dagster_storage:/opt/dagster/app/dagster_home
+    networks:
+      - dakota_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      enrichment-api:
+        condition: service_started
+    restart: unless-stopped
 
 networks:
   dakota_network:
@@ -38,3 +76,4 @@ networks:
 
 volumes:
   postgres_data:
+  dagster_storage:
