@@ -63,8 +63,6 @@ reports/generated/*
 # Orchestration logs and metadata
 orchestration/logs/
 orchestration/.dagster/
-orchestration/.airflow/
-orchestration/.prefect/
 
 # Test coverage
 .coverage
