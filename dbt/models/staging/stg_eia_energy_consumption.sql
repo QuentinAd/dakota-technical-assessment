@@ -48,8 +48,15 @@ consumption_data as (
 
         period as period_raw,
 
-        -- Location dimension
-        trim(upper(location)) as location,
+        -- Location dimension (add US- prefix for state codes to match dim_location)
+        case
+            when length(trim(location)) = 2
+                and location_type not in ('pacific', 'east south central', 'west south central',
+                                          'east north central', 'west north central',
+                                          'mountain', 'new england', 'middle atlantic', 'south atlantic')
+            then 'US-' || trim(upper(location))
+            else trim(upper(location))
+        end as location,
         trim(lower(location_type)) as location_type,
 
         -- Sector dimension (key for consumption data)

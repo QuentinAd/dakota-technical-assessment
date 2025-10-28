@@ -3,13 +3,13 @@
         materialized='table',
         tags=['marts', 'fact_table'],
         post_hook=[
-            "CREATE INDEX IF NOT EXISTS idx_fct_energy_metrics_time_key ON {{ this }} (time_key)",
-            "CREATE INDEX IF NOT EXISTS idx_fct_energy_metrics_location_key ON {{ this }} (location_key)",
-            "CREATE INDEX IF NOT EXISTS idx_fct_energy_metrics_time_location ON {{ this }} (time_key, location_key)",
-            "ALTER TABLE {{ this }} DROP CONSTRAINT IF EXISTS fk_fct_energy_metrics_time",
-            "ALTER TABLE {{ this }} DROP CONSTRAINT IF EXISTS fk_fct_energy_metrics_location",
-            "ALTER TABLE {{ this }} ADD CONSTRAINT fk_fct_energy_metrics_time FOREIGN KEY (time_key) REFERENCES marts.dim_time(time_key)",
-            "ALTER TABLE {{ this }} ADD CONSTRAINT fk_fct_energy_metrics_location FOREIGN KEY (location_key) REFERENCES marts.dim_location(location_key)"
+            "CREATE INDEX IF NOT EXISTS idx_fct_energy_metrics_time_key ON {{ this }} (time_key);",
+            "CREATE INDEX IF NOT EXISTS idx_fct_energy_metrics_location_key ON {{ this }} (location_key);",
+            "CREATE INDEX IF NOT EXISTS idx_fct_energy_metrics_time_location ON {{ this }} (time_key, location_key);",
+            "ALTER TABLE {{ this }} DROP CONSTRAINT IF EXISTS fk_fct_energy_metrics_time;",
+            "ALTER TABLE {{ this }} DROP CONSTRAINT IF EXISTS fk_fct_energy_metrics_location;",
+            "ALTER TABLE {{ this }} ADD CONSTRAINT fk_fct_energy_metrics_time FOREIGN KEY (time_key) REFERENCES marts.dim_time(time_key);",
+            "ALTER TABLE {{ this }} ADD CONSTRAINT fk_fct_energy_metrics_location FOREIGN KEY (location_key) REFERENCES marts.dim_location(location_key);"
         ]
     )
 }}
