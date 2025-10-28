@@ -1,0 +1,144 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Raw data layer (Bronze) containing unprocessed data from external sources.
+      Data is stored exactly as received from APIs with minimal transformation.
+    database: energy_analytics
+    schema: raw
+
+    # Source freshness checks - data should be less than 24 hours old
+    freshness:
+      warn_after: {count: 12, period: hour}
+      error_after: {count: 24, period: hour}
+
+    # Metadata applied to all tables in this source
+    meta:
+      owner: "Data Engineering Team"
+      contains_pii: false
+
+    tables:
+      - name: eia_energy_data
+        description: >
+          Electricity generation and consumption data from the U.S. Energy Information
+          Administration (EIA) API. Contains time-series energy metrics by location,
+          source, and sector. Full API response stored in raw_json for flexibility.
+
+        columns:
+          - name: id
+            description: "Auto-incrementing primary key"
+            tests:
+              - unique
+              - not_null
+
+          - name: source
+            description: "Data source identifier (always 'EIA' for this table)"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['EIA']
+
+          - name: ingestion_timestamp
+            description: "Timestamp when data was ingested into the database"
+            tests:
+              - not_null
+
+          - name: series_id
+            description: "EIA API series identifier for the data point"
+
+          - name: period
+            description: "Time period for the data (YYYY-MM format for monthly data)"
+            tests:
+              - not_null
+
+          - name: value
+            description: "Numeric value of the energy metric"
+            tests:
+              - not_null
+
+          - name: units
+            description: "Unit of measurement (e.g., MWh, thousand tons)"
+
+          - name: location
+            description: "Geographic location code (e.g., US-CA for California)"
+            tests:
+              - not_null
+
+          - name: location_type
+            description: "Type of geographic area (state, region, national)"
+
+          - name: energy_source
+            description: >
+              Type of energy source (coal, natural_gas, nuclear, solar, wind,
+              hydro, other)
+
+          - name: sector
+            description: >
+              Energy sector (residential, commercial, industrial, transportation,
+              electric_power)
+
+          - name: raw_json
+            description: "Complete API response in JSONB format for flexibility"
+
+      - name: enrichment_data
+        description: >
+          Synthetic enrichment data from the FastAPI service including weather,
+          economic indicators, and population data. Used to enrich energy analytics
+          with contextual information.
+
+        columns:
+          - name: id
+            description: "Auto-incrementing primary key"
+            tests:
+              - unique
+              - not_null
+
+          - name: source
+            description: "Data source identifier (always 'FastAPI' for this table)"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['FastAPI']
+
+          - name: ingestion_timestamp
+            description: "Timestamp when data was ingested into the database"
+            tests:
+              - not_null
+
+          - name: period
+            description: "Date for the enrichment data (YYYY-MM-DD format)"
+            tests:
+              - not_null
+
+          - name: location
+            description: "Geographic location code matching EIA data (e.g., US-CA)"
+            tests:
+              - not_null
+
+          - name: temperature_avg
+            description: "Average temperature for the period in Fahrenheit"
+            tests:
+              - not_null
+
+          - name: temperature_unit
+            description: "Temperature unit (F for Fahrenheit)"
+
+          - name: population
+            description: "Population estimate for the location"
+            tests:
+              - not_null
+
+          - name: gdp_per_capita
+            description: "GDP per capita in USD for the location"
+            tests:
+              - not_null
+
+          - name: industrial_activity_index
+            description: >
+              Industrial activity index (base 100) indicating economic activity level
+            tests:
+              - not_null
+
+          - name: raw_json
+            description: "Complete API response in JSONB format for flexibility"
