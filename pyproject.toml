@@ -3,7 +3,7 @@ name = "dakota-analytics"
 version = "0.1.0"
 description = "Data Engineering Technical Assessment - End-to-end data pipeline"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "asyncpg>=0.30.0",
     # FastAPI and web framework
@@ -38,6 +38,9 @@ dev = [
     # Testing
     "pytest>=8.3.0",
     "pytest-cov>=6.0.0",
+    "pytest-asyncio>=1.2.0",
+    "pytest-mock>=3.15.1",
+    "pyyaml>=6.0.3",
     
     # Development tools
     "ipython>=8.28.0",
@@ -74,10 +77,3 @@ ignore = [
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-
-[dependency-groups]
-dev = [
-    "pytest-asyncio>=1.2.0",
-    "pytest-mock>=3.15.1",
-    "pyyaml>=6.0.3",
-]

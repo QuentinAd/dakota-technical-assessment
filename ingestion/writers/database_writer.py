@@ -295,7 +295,9 @@ class EnrichmentDataWriter(DatabaseWriter):
 
                 population = enrichment_record.get("population")
                 # API returns "gdp_per_capita_usd", not "gdp_per_capita"
-                gdp_per_capita = enrichment_record.get("gdp_per_capita_usd") or enrichment_record.get("gdp_per_capita")
+                gdp_per_capita = enrichment_record.get(
+                    "gdp_per_capita_usd"
+                ) or enrichment_record.get("gdp_per_capita")
                 industrial_activity_index = enrichment_record.get("industrial_activity_index")
 
                 # Store full response as JSON
@@ -356,6 +358,11 @@ class EnrichmentDataWriter(DatabaseWriter):
                     temperature_avg = record.get("temperature_fahrenheit")
                     temperature_unit = "fahrenheit" if temperature_avg is not None else None
 
+                    # API returns "gdp_per_capita_usd", not "gdp_per_capita"
+                    gdp_per_capita = record.get("gdp_per_capita_usd") or record.get(
+                        "gdp_per_capita"
+                    )
+
                     batch_data.append(
                         (
                             "FastAPI",  # source
@@ -364,7 +371,7 @@ class EnrichmentDataWriter(DatabaseWriter):
                             temperature_avg,
                             temperature_unit,
                             record.get("population"),
-                            record.get("gdp_per_capita"),
+                            gdp_per_capita,
                             record.get("industrial_activity_index"),
                             json.dumps(record),  # raw_json
                         )

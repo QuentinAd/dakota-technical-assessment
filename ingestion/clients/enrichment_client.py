@@ -226,10 +226,7 @@ class EnrichmentClient:
             )
         """
         # Convert date to string format
-        if hasattr(date, "strftime"):
-            date_str = date.strftime("%Y-%m-%d")
-        else:
-            date_str = str(date)
+        date_str = date.strftime("%Y-%m-%d") if hasattr(date, "strftime") else str(date)
 
         # Create location-period pairs
         locations_periods = [(loc, date_str) for loc in locations]

@@ -128,11 +128,11 @@ The `uv.lock` file ensures reproducible builds. **Commit this to git**.
 `uv` can install Python versions for you:
 
 ```bash
-# Install Python 3.11
-uv python install 3.11
+# Install Python 3.13
+uv python install 3.13
 
 # Use a specific Python version
-uv sync --python 3.11
+uv sync --python 3.13
 ```
 
 ### Scripts
@@ -205,7 +205,7 @@ uv tree                   # Show dependency tree
 You can use uv in Docker for faster builds:
 
 ```dockerfile
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
