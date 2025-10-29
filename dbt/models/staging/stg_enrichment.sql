@@ -74,6 +74,8 @@ enrichment_cleaned as (
         and location is not null
         and temperature_avg is not null
         and population is not null
+        -- Note: gdp_per_capita and industrial_activity_index can be NULL
+        -- They are tracked in tests but shouldn't exclude records from joins
 )
 
 select

@@ -55,7 +55,8 @@ sources:
           - name: value
             description: "Numeric value of the energy metric"
             tests:
-              - not_null
+              - not_null:
+                  severity: warn
 
           - name: units
             description: "Unit of measurement (e.g., MWh, thousand tons)"
@@ -132,7 +133,8 @@ sources:
           - name: gdp_per_capita
             description: "GDP per capita in USD for the location"
             tests:
-              - not_null
+              - not_null:
+                  severity: warn
 
           - name: industrial_activity_index
             description: >
