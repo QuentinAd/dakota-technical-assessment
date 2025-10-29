@@ -35,7 +35,7 @@ The Energy Analytics Pipeline is a production-ready data engineering system that
 
 **Purpose**: Generate synthetic enrichment data (weather, economic indicators)
 
-**Technology**: FastAPI + Uvicorn (Python 3.11)
+**Technology**: FastAPI + Uvicorn (Python 3.13)
 
 **Key Features**:
 - RESTful API with OpenAPI documentation

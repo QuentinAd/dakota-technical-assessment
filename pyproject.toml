@@ -3,7 +3,7 @@ name = "dakota-analytics"
 version = "0.1.0"
 description = "Data Engineering Technical Assessment - End-to-end data pipeline"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "asyncpg>=0.30.0",
     # FastAPI and web framework
