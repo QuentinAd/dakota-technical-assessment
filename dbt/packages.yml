@@ -1,0 +1,6 @@
+# dbt packages configuration
+# Run `dbt deps` to install these packages
+
+packages:
+  - package: dbt-labs/dbt_utils
+    version: 1.3.0

@@ -20,6 +20,9 @@ wheels/
 .installed.cfg
 *.egg
 
+# Ruff
+.ruff_cache
+
 # Virtual Environment
 venv/
 env/
@@ -57,14 +60,12 @@ dbt/.user.yml
 *.ipynb_checkpoints
 
 # Reports (keep templates, ignore generated)
-reports/generated/*
-!reports/generated/.gitkeep
+reports/output/*
+!reports/output/.gitkeep
 
 # Orchestration logs and metadata
 orchestration/logs/
 orchestration/.dagster/
-orchestration/.airflow/
-orchestration/.prefect/
 
 # Test coverage
 .coverage
@@ -86,3 +87,7 @@ Thumbs.db
 tmp/
 temp/
 .history/*
+
+# AI assisted coding
+.claude
+CLAUDE.md

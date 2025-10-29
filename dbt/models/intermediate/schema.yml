@@ -1,0 +1,181 @@
+version: 2
+
+models:
+  - name: int_energy_combined
+    description: >
+      Combined energy analytics dataset integrating generation, consumption, and
+      enrichment data. This intermediate model applies business logic to calculate
+      renewable percentages, per capita metrics, and efficiency ratios.
+
+    columns:
+      - name: energy_combined_key
+        description: "MD5 hash surrogate key combining period_date and location"
+        tests:
+          - unique
+          - not_null
+
+      - name: period_date
+        description: "Date for the energy metrics"
+        tests:
+          - not_null
+
+      - name: location
+        description: "Geographic location code (e.g., US-CA)"
+        tests:
+          - not_null
+
+      - name: location_type
+        description: "Type of geographic area (state, region, national)"
+
+      - name: total_generation_mwh
+        description: "Total electricity generation in MWh across all sources"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: renewable_generation_mwh
+        description: "Total renewable generation (solar, wind, hydro) in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: fossil_generation_mwh
+        description: "Total fossil fuel generation (coal, natural gas) in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: nuclear_generation_mwh
+        description: "Nuclear generation in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: other_generation_mwh
+        description: "Other/unclassified generation in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: energy_source_count
+        description: "Number of distinct energy sources contributing to generation"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+
+      - name: renewable_percentage
+        description: "Percentage of total generation from renewable sources"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "between 0 and 100"
+
+      - name: fossil_percentage
+        description: "Percentage of total generation from fossil fuels"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "between 0 and 100"
+
+      - name: total_consumption_mwh
+        description: "Total electricity consumption in MWh (may be null)"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+              config:
+                where: "total_consumption_mwh is not null"
+
+      - name: residential_consumption_mwh
+        description: "Residential sector consumption in MWh"
+
+      - name: commercial_consumption_mwh
+        description: "Commercial sector consumption in MWh"
+
+      - name: industrial_consumption_mwh
+        description: "Industrial sector consumption in MWh"
+
+      - name: transportation_consumption_mwh
+        description: "Transportation sector consumption in MWh"
+
+      - name: sector_count
+        description: "Number of sectors with consumption data"
+
+      - name: generation_to_consumption_ratio
+        description: >
+          Ratio of generation to consumption (values > 1 indicate net export,
+          < 1 indicate net import)
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+              config:
+                where: "generation_to_consumption_ratio is not null"
+                severity: warn
+
+      - name: temperature_fahrenheit
+        description: "Average temperature in Fahrenheit"
+
+      - name: temperature_category
+        description: "Categorical temperature classification"
+        tests:
+          - accepted_values:
+              values: ['freezing', 'cold', 'moderate', 'warm', 'hot', 'unknown']
+              config:
+                where: "temperature_category is not null"
+
+      - name: population
+        description: "Population estimate for the location"
+
+      - name: population_category
+        description: "Categorical population classification"
+
+      - name: gdp_per_capita
+        description: "GDP per capita in USD"
+
+      - name: industrial_activity_index
+        description: "Industrial activity index (base 100)"
+
+      - name: industrial_activity_category
+        description: "Categorical industrial activity classification"
+
+      - name: generation_per_capita_mwh
+        description: "Generation per million people (MWh)"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+              config:
+                where: "generation_per_capita_mwh is not null"
+                severity: warn
+
+      - name: consumption_per_capita_mwh
+        description: "Consumption per million people (MWh)"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+              config:
+                where: "consumption_per_capita_mwh is not null"
+                severity: warn
+
+      - name: has_consumption_data
+        description: "Flag indicating if consumption data is available"
+        tests:
+          - not_null
+
+      - name: has_enrichment_data
+        description: "Flag indicating if enrichment data is available"
+        tests:
+          - not_null
+
+      - name: generation_ingested_at
+        description: "Timestamp when generation data was ingested"
+
+      - name: consumption_ingested_at
+        description: "Timestamp when consumption data was ingested"
+
+      - name: enrichment_ingested_at
+        description: "Timestamp when enrichment data was ingested"

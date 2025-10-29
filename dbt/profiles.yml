@@ -1,0 +1,31 @@
+# dbt profile configuration for energy_analytics project
+# This file configures the database connection for dbt
+
+energy_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_POSTGRES_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_POSTGRES_PORT', '5432') | int }}"
+      user: "{{ env_var('POSTGRES_USER', 'dakota_user') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', 'change_me') }}"
+      dbname: "{{ env_var('POSTGRES_DB', 'energy_analytics') }}"
+      schema: public  # Default schema - models will use their configured schemas
+      threads: 4
+      keepalives_idle: 0
+      connect_timeout: 10
+      search_path: "staging,intermediate,marts,raw,public"
+
+    prod:
+      type: postgres
+      host: "{{ env_var('DBT_POSTGRES_HOST', 'postgres') }}"
+      port: "{{ env_var('DBT_POSTGRES_PORT', '5432') | int }}"
+      user: "{{ env_var('POSTGRES_USER', 'dakota_user') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', 'change_me') }}"
+      dbname: "{{ env_var('POSTGRES_DB', 'energy_analytics') }}"
+      schema: public  # Default schema - models will use their configured schemas
+      threads: 4
+      keepalives_idle: 0
+      connect_timeout: 10
+      search_path: "staging,intermediate,marts,raw,public"

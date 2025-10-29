@@ -1,0 +1,198 @@
+version: 2
+
+models:
+  - name: fct_energy_metrics
+    description: >
+      Fact table for energy analytics containing generation, consumption, and
+      enrichment metrics aggregated by time and location. Uses star schema design
+      with foreign keys to dimension tables for optimized analytical queries.
+
+    meta:
+      owner: "Data Engineering Team"
+      critical: true
+
+    columns:
+      - name: metric_key
+        description: "MD5 hash surrogate key for the fact table record"
+        tests:
+          - unique
+          - not_null
+
+      - name: time_key
+        description: "Foreign key to dim_time dimension (YYYYMMDD integer format)"
+        tests:
+          - not_null
+
+      - name: location_key
+        description: "Foreign key to dim_location dimension"
+        tests:
+          - not_null
+
+      # Generation metrics by source
+      - name: coal_generation_mwh
+        description: "Coal-based electricity generation in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: natural_gas_generation_mwh
+        description: "Natural gas electricity generation in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: nuclear_generation_mwh
+        description: "Nuclear electricity generation in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: solar_generation_mwh
+        description: "Solar electricity generation in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: wind_generation_mwh
+        description: "Wind electricity generation in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: hydro_generation_mwh
+        description: "Hydroelectric generation in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: other_generation_mwh
+        description: "Other/unclassified generation in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: total_generation_mwh
+        description: "Total electricity generation across all sources in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+              config:
+                severity: error
+
+      - name: renewable_generation_mwh
+        description: "Total renewable generation (solar + wind + hydro) in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: fossil_generation_mwh
+        description: "Total fossil fuel generation (coal + natural gas) in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      # Consumption metrics by sector
+      - name: residential_consumption_mwh
+        description: "Residential sector electricity consumption in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: commercial_consumption_mwh
+        description: "Commercial sector electricity consumption in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: industrial_consumption_mwh
+        description: "Industrial sector electricity consumption in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: transportation_consumption_mwh
+        description: "Transportation sector electricity consumption in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: total_consumption_mwh
+        description: "Total electricity consumption across all sectors in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      # Calculated metrics
+      - name: renewable_percentage
+        description: "Percentage of total generation from renewable sources"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "between 0 and 100"
+              config:
+                severity: error
+
+      - name: net_generation_mwh
+        description: >
+          Net generation (generation - consumption). Positive indicates net
+          export, negative indicates net import.
+
+      # Enrichment data
+      - name: avg_temperature_fahrenheit
+        description: "Average temperature in Fahrenheit for the period"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "between -50 and 150"
+              config:
+                where: "avg_temperature_fahrenheit is not null"
+                severity: warn
+
+      - name: population
+        description: "Population estimate for the location"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+              config:
+                where: "population is not null"
+
+      - name: gdp_per_capita_usd
+        description: "GDP per capita in USD for the location"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+              config:
+                where: "gdp_per_capita_usd is not null"
+
+      - name: industrial_activity_index
+        description: "Industrial activity index (base 100)"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+              config:
+                where: "industrial_activity_index is not null"
+
+      # Metadata
+      - name: created_at
+        description: "Timestamp when record was created"
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: "Timestamp when record was last updated"
+        tests:
+          - not_null

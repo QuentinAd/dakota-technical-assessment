@@ -1,0 +1,223 @@
+version: 2
+
+models:
+  - name: stg_eia_energy_generation
+    description: >
+      Cleaned and typed EIA energy generation data. This staging model transforms
+      raw EIA API responses into a structured format with standardized units (MWh)
+      and proper data types.
+
+    columns:
+      - name: generation_key
+        description: "MD5 hash surrogate key combining source_id, period_date, location, and energy_source"
+        tests:
+          - unique
+          - not_null
+
+      - name: source_id
+        description: "Reference to the raw.eia_energy_data.id for lineage tracking"
+        tests:
+          - not_null
+
+      - name: data_source
+        description: "Data source identifier (always 'EIA')"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['EIA']
+
+      - name: ingestion_timestamp
+        description: "When the data was ingested into raw layer"
+        tests:
+          - not_null
+
+      - name: period_date
+        description: "Parsed date for the reporting period"
+        tests:
+          - not_null
+
+      - name: period_type
+        description: "Granularity of the period (daily, monthly, annual)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['daily', 'monthly', 'annual', 'unknown']
+
+      - name: location
+        description: "Standardized location code (e.g., US-CA)"
+        tests:
+          - not_null
+
+      - name: energy_source
+        description: "Type of energy source (coal, natural_gas, nuclear, solar, wind, hydro)"
+        tests:
+          - not_null
+
+      - name: generation_mwh
+        description: "Standardized generation value in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+              config:
+                severity: warn
+
+      - name: units
+        description: "Original units from source data"
+
+      - name: series_id
+        description: "EIA API series identifier"
+
+  - name: stg_eia_energy_consumption
+    description: >
+      Cleaned and typed EIA energy consumption/sales data. This staging model
+      transforms raw EIA API responses focusing on consumption metrics by sector.
+
+    columns:
+      - name: consumption_key
+        description: "MD5 hash surrogate key combining source_id, period_date, location, and sector"
+        tests:
+          - unique
+          - not_null
+
+      - name: source_id
+        description: "Reference to the raw.eia_energy_data.id for lineage tracking"
+        tests:
+          - not_null
+
+      - name: data_source
+        description: "Data source identifier (always 'EIA')"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['EIA']
+
+      - name: ingestion_timestamp
+        description: "When the data was ingested into raw layer"
+        tests:
+          - not_null
+
+      - name: period_date
+        description: "Parsed date for the reporting period"
+        tests:
+          - not_null
+
+      - name: period_type
+        description: "Granularity of the period (daily, monthly, annual)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['daily', 'monthly', 'annual', 'unknown']
+
+      - name: location
+        description: "Standardized location code (e.g., US-CA)"
+        tests:
+          - not_null
+
+      - name: sector
+        description: "Energy consumption sector"
+
+      - name: consumption_mwh
+        description: "Standardized consumption value in MWh"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+              config:
+                severity: warn
+
+      - name: units
+        description: "Original units from source data"
+
+      - name: series_id
+        description: "EIA API series identifier"
+
+  - name: stg_enrichment
+    description: >
+      Cleaned and typed enrichment data from FastAPI service. Includes weather,
+      demographic, and economic indicators to enrich energy analytics.
+
+    columns:
+      - name: enrichment_key
+        description: "MD5 hash surrogate key combining source_id, period_date, and location"
+        tests:
+          - unique
+          - not_null
+
+      - name: source_id
+        description: "Reference to the raw.enrichment_data.id for lineage tracking"
+        tests:
+          - not_null
+
+      - name: data_source
+        description: "Data source identifier (always 'FastAPI')"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['FastAPI']
+
+      - name: ingestion_timestamp
+        description: "When the data was ingested into raw layer"
+        tests:
+          - not_null
+
+      - name: period_date
+        description: "Date for the enrichment data"
+        tests:
+          - not_null
+
+      - name: location
+        description: "Standardized location code matching EIA data (e.g., US-CA)"
+        tests:
+          - not_null
+
+      - name: temperature_fahrenheit
+        description: "Average temperature in Fahrenheit (validated range)"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "between -50 and 150"
+              config:
+                severity: error
+
+      - name: temperature_unit
+        description: "Temperature unit (should always be F)"
+
+      - name: temperature_category
+        description: "Categorical temperature classification"
+        tests:
+          - accepted_values:
+              values: ['freezing', 'cold', 'moderate', 'warm', 'hot', 'unknown']
+
+      - name: population
+        description: "Population estimate for the location"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+
+      - name: population_category
+        description: "Categorical population classification"
+        tests:
+          - accepted_values:
+              values: ['small', 'medium', 'large', 'very_large', 'unknown']
+
+      - name: gdp_per_capita
+        description: "GDP per capita in USD"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+              config:
+                severity: warn
+
+      - name: industrial_activity_index
+        description: "Industrial activity index (base 100)"
+        tests:
+          - not_null
+
+      - name: industrial_activity_category
+        description: "Categorical industrial activity classification"
+        tests:
+          - accepted_values:
+              values: ['low', 'normal', 'high', 'unknown']
