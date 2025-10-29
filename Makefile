@@ -43,13 +43,16 @@ run: ## Start all services (PostgreSQL, FastAPI, Dagster)
 
 test: ## Run all tests (unit + integration + dbt)
 	@echo "Running Python unit tests..."
-	@set -a; . ./.env; set +a; uv run pytest tests/unit/ -v --cov=. --cov-report=term-missing
+	uv run pytest tests/unit/ -v --cov=. --cov-report=term-missing
 	@echo ""
 	@echo "Running integration tests (requires database)..."
-	@set -a; . ./.env; set +a; uv run pytest tests/integration/ -v
+	uv run pytest tests/integration/ -v
+	@echo ""
+	@echo "Running dbt models..."
+	cd dbt && POSTGRES_DB=$(POSTGRES_DB) POSTGRES_USER=$(POSTGRES_USER) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) uv run dbt run
 	@echo ""
 	@echo "Running dbt tests..."
-	@set -a; . ./.env; set +a; cd dbt && uv run dbt test
+	cd dbt && POSTGRES_DB=$(POSTGRES_DB) POSTGRES_USER=$(POSTGRES_USER) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) uv run dbt test
 	@echo ""
 	@echo "All tests passed!"
 
@@ -87,19 +90,19 @@ format: ## Format code with ruff
 
 dbt-run: ## Run dbt models
 	@echo "Running dbt models..."
-	@set -a; . ./.env; set +a; cd dbt && uv run dbt run
+	cd dbt && POSTGRES_DB=$(POSTGRES_DB) POSTGRES_USER=$(POSTGRES_USER) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) uv run dbt run
 	@echo "dbt models complete!"
 
-dbt-test: ## Run dbt tests
+dbt-test: dbt-run ## Run dbt tests (runs models first)
 	@echo "Running dbt tests..."
-	@set -a; . ./.env; set +a; cd dbt && uv run dbt test
+	cd dbt && POSTGRES_DB=$(POSTGRES_DB) POSTGRES_USER=$(POSTGRES_USER) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) uv run dbt test
 	@echo "dbt tests passed!"
 
 dbt-docs: ## Generate and serve dbt documentation
 	@echo "Generating dbt documentation..."
-	@set -a; . ./.env; set +a; cd dbt && uv run dbt docs generate
+	cd dbt && POSTGRES_DB=$(POSTGRES_DB) POSTGRES_USER=$(POSTGRES_USER) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) uv run dbt docs generate
 	@echo "Serving documentation on http://localhost:8080"
-	@set -a; . ./.env; set +a; cd dbt && uv run dbt docs serve
+	cd dbt && POSTGRES_DB=$(POSTGRES_DB) POSTGRES_USER=$(POSTGRES_USER) POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) uv run dbt docs serve
 
 report: ## Generate energy analytics reports (runs full pipeline)
 	@echo "Running full pipeline: EIA ingestion -> Enrichment -> dbt -> Quality checks -> Reports"
